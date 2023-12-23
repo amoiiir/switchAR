@@ -1,0 +1,342 @@
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../util/smart_device_box.dart';
+import 'package:external_app_launcher/external_app_launcher.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert'; // Import for json decoding
+import 'dart:async';
+import 'package:web_socket_channel/web_socket_channel.dart';
+
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  // padding constants
+  final double horizontalPadding = 40;
+  final double verticalPadding = 25;
+
+  //polling timer
+  Timer? _pollingTimer;
+  WebSocketChannel? channel;
+
+  // list of smart devices
+  List mySmartDevices = [
+    // [ smartDeviceName, iconPath , powerStatus ]
+    ["Red Light", "lib/icons/light-bulb.png", false, "V1"],
+    ["Main Light", "lib/icons/light-bulb.png", false, "V2"],
+    ["Yellow Light", "lib/icons/light-bulb.png", false, "V3"],
+    ["Smart Fan", "lib/icons/fan.png", false, "V4"],
+  ];
+
+  // power button switched
+  void powerSwitchChanged(bool value, int index) {
+    setState(() {
+      mySmartDevices[index][2] = value;
+    });
+  }
+
+  //device power
+  // Function to toggle device power and make API call
+  void toggleDevicePower(int index, bool newState) async {
+    setState(() {
+      // mySmartDevices[index][2] = !mySmartDevices[index][2];
+      mySmartDevices[index][2] = newState;
+    });
+
+    String token = "NBFTcjxflna3kYS55nd5KLRAmcfDMUfi";
+    String devicePin = mySmartDevices[index][3];
+    int value = mySmartDevices[index][2] ? 1 : 0;
+
+    String url =
+        "https://blynk.cloud/external/api/update?token=$token&$devicePin=$value";
+
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        // Handle successful response
+      } else {
+        // Handle error
+      }
+    } catch (e) {
+      // Handle network error
+    }
+  }
+
+  // Function to get the current state of a Blynk virtual pin
+  Future<String> getBlynkPinValue(String token, String devicePin) async {
+    final url = Uri.parse('http://blynk-cloud.com/$token/get/$devicePin');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      return json.decode(response.body)[0];
+    } else {
+      throw Exception('Failed to load pin value');
+    }
+  }
+
+  // Function to initialize the states of devices
+  void initializeDeviceStates() async {
+    String token = "NBFTcjxflna3kYS55nd5KLRAmcfDMUfi";
+    for (int i = 0; i < mySmartDevices.length; i++) {
+      try {
+        String pinValue = await getBlynkPinValue(token, mySmartDevices[i][3]);
+        bool isOn = pinValue == "1";
+        if (mySmartDevices[i][2] != isOn) {
+          setState(() {
+            mySmartDevices[i][2] = isOn;
+          });
+        }
+      } catch (e) {
+        print('Error fetching pin value: $e'); // Log the error
+      }
+    }
+  }
+
+  void _startPolling() {
+    _pollingTimer = Timer.periodic(
+        Duration(seconds: 10), (Timer t) => initializeDeviceStates());
+  }
+
+  Future<void> pollBlynkAPI() async {
+    String token = "NBFTcjxflna3kYS55nd5KLRAmcfDMUfi";
+    for (int i = 0; i < mySmartDevices.length; i++) {
+      try {
+        String pinValue = await getBlynkPinValue(token, mySmartDevices[i][3]);
+        print(
+            "Device: ${mySmartDevices[i][0]}, Blynk API Value: $pinValue"); // Log API value
+        bool isOn = pinValue == "1";
+        if (mySmartDevices[i][2] != isOn) {
+          print(
+              "Updating state for ${mySmartDevices[i][0]}"); // Log state update
+          setState(() {
+            mySmartDevices[i][2] = isOn;
+          });
+        }
+      } catch (e) {
+        print("Error polling Blynk API: $e"); // Log errors
+      }
+    }
+  }
+
+  //websocket function
+  void connectToWebSocket() {
+    channel = WebSocketChannel.connect(
+      Uri.parse(
+          ' ws://blynk-cloud.com:8082/websockets'), // Replace with your WebSocket URL
+    );
+
+    channel!.stream.listen(
+      (message) {
+        // Handle incoming messages
+        processMessage(message);
+      },
+      onDone: () {
+        // Handle WebSocket closing
+      },
+      onError: (error) {
+        // Handle errors
+        print(error);
+      },
+    );
+  }
+
+  void processMessage(dynamic message) {
+    // Assuming 'message' is a JSON string with information about device states
+    // Example message format: {"devicePin": "V1", "state": "1"}
+
+    try {
+      Map<String, dynamic> messageData = json.decode(message);
+      String devicePin = messageData['devicePin'];
+      bool isOn = messageData['state'] == "1";
+
+      // Find the device in your list and update its state
+      int deviceIndex =
+          mySmartDevices.indexWhere((device) => device[3] == devicePin);
+      if (deviceIndex != -1) {
+        setState(() {
+          mySmartDevices[deviceIndex][2] = isOn;
+        });
+      }
+    } catch (e) {
+      print("Error processing message: $e");
+    }
+  }
+
+  void sendMessage(String message) {
+    if (channel != null) {
+      channel!.sink.add(message);
+    }
+  }
+
+  void disposeWebSocket() {
+    if (channel != null) {
+      channel!.sink.close();
+      channel = null;
+    }
+  }
+
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initializeDeviceStates();
+    _startPolling();
+  }
+
+  @override
+  void dispose() {
+    _pollingTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.grey[300],
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // appbar:
+            // Padding(
+            //   padding: EdgeInsets.symmetric(
+            //     horizontal: horizontalPadding,
+            //     vertical: verticalPadding,
+            //   ),
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //     children: [
+            //       // menu icon
+            //       Image.asset(
+            //         'lib/icons/menu.png',
+            //         height: 45,
+            //         color: Colors.grey[800],
+            //       ),
+
+            //       // account icon
+            //       Icon(
+            //         Icons.person,
+            //         size: 45,
+            //         color: Colors.grey[800],
+            //       )
+            //     ],
+            //   ),
+            // ),
+
+            const SizedBox(height: 20),
+
+            // welcome home
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Welcome Home,",
+                    style: TextStyle(fontSize: 20, color: Colors.grey.shade800),
+                  ),
+                  Text(
+                    'Haikal Wijdan',
+                    style: GoogleFonts.bebasNeue(fontSize: 50),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 25),
+
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 40.0),
+              child: Divider(
+                thickness: 1,
+                color: Color.fromARGB(255, 204, 204, 204),
+              ),
+            ),
+
+            const SizedBox(height: 25),
+
+            // smart devices grid
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+              child: Text(
+                "Smart Devices",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                  color: Colors.grey.shade800,
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+
+            // grid
+            Expanded(
+              child: GridView.builder(
+                itemCount: 4,
+                physics: const NeverScrollableScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  childAspectRatio: 1 / 1.3,
+                ),
+                itemBuilder: (context, index) {
+                  return SmartDeviceBox(
+                    smartDeviceName: mySmartDevices[index][0],
+                    iconPath: mySmartDevices[index][1],
+                    powerOn: mySmartDevices[index][2],
+                    onChanged: (bool value) {
+                      toggleDevicePower(index, value);
+                    },
+                  );
+                },
+              ),
+            )
+          ],
+        ),
+      ),
+      floatingActionButton: Padding(
+        padding:
+            const EdgeInsets.all(40.0), // Adjust this padding value as needed
+        child: Container(
+          width: 80,
+          height: 80,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: Color.fromARGB(255, 27, 28, 30),
+            boxShadow: [
+              BoxShadow(
+                color: Color.fromARGB(
+                    130, 237, 125, 58), // Customize the glow color
+                spreadRadius: 15, // Spread radius
+                blurRadius: 15, // Blur radius
+                offset: Offset(0, 0), // changes position of shadow
+              ),
+            ],
+          ),
+          child: FloatingActionButton(
+            onPressed: () async {
+              await LaunchApp.openApp(
+                androidPackageName: 'com.DefaultCompany.switchAR',
+                //if it installed, it will open, unless it will open playstore
+                openStore: true,
+              );
+            },
+            child: const Icon(Icons.add),
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+    );
+  }
+}
