@@ -1,0 +1,91 @@
+@override
+Widget build(BuildContext context) {
+  return Scaffold(
+    backgroundColor: Colors.grey[300],
+    body: SafeArea(
+      child: SingleChildScrollView( // Wrap in a SingleChildScrollView for scrolling
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ... Existing widgets ...
+
+            // First grid
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+              child: Text(
+                "Smart Devices",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                  color: Colors.grey.shade800,
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            GridView.builder(
+              shrinkWrap: true, // Necessary for GridView inside Column/ScrollView
+              physics: NeverScrollableScrollPhysics(), // Disable scrolling inside the grid
+              itemCount: mySmartDevices.length,
+              padding: const EdgeInsets.symmetric(horizontal: 25),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 1 / 1.3,
+              ),
+              itemBuilder: (context, index) {
+                return SmartDeviceBox(
+                  smartDeviceName: mySmartDevices[index][0],
+                  iconPath: mySmartDevices[index][1],
+                  powerOn: mySmartDevices[index][2],
+                  onChanged: (bool value) {
+                    toggleDevicePower(index, value);
+                  },
+                );
+              },
+            ),
+            
+            // Add spacing between grids
+            const SizedBox(height: 20),
+
+            // Second grid (Repeat the structure for the second grid)
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+              child: Text(
+                "Other Devices", // Change the title as needed
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                  color: Colors.grey.shade800,
+                ),
+              ),
+            ),
+            const SizedBox(height: 10),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: 4, // Update this count as per your second grid's data
+              padding: const EdgeInsets.symmetric(horizontal: 25),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 1 / 1.3,
+              ),
+              itemBuilder: (context, index) {
+                // Update this to build items for your second grid
+                return Container(
+                  // Example item
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Center(
+                    child: Text('Item ${index + 1}'),
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    ),
+    // ... FloatingActionButton code ...
+  );
+}

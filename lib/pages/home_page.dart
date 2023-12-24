@@ -30,6 +30,7 @@ class _HomePageState extends State<HomePage> {
     ["Main Light", "lib/icons/light-bulb.png", false, "V2"],
     ["Yellow Light", "lib/icons/light-bulb.png", false, "V3"],
     ["Smart Fan", "lib/icons/fan.png", false, "V4"],
+    // ["Smart TV", "lib/icons/tv.png", false, "V5"]
   ];
 
   // power button switched
@@ -205,85 +206,86 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Colors.grey[300],
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // appbar:
-            // Padding(
-            //   padding: EdgeInsets.symmetric(
-            //     horizontal: horizontalPadding,
-            //     vertical: verticalPadding,
-            //   ),
-            //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //     children: [
-            //       // menu icon
-            //       Image.asset(
-            //         'lib/icons/menu.png',
-            //         height: 45,
-            //         color: Colors.grey[800],
-            //       ),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Padding(
+              //   padding: EdgeInsets.symmetric(
+              //     horizontal: horizontalPadding,
+              //     vertical: verticalPadding,
+              //   ),
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              //     children: [
+              //       // menu icon
+              //       Image.asset(
+              //         'lib/icons/menu.png',
+              //         height: 45,
+              //         color: Colors.grey[800],
+              //       ),
 
-            //       // account icon
-            //       Icon(
-            //         Icons.person,
-            //         size: 45,
-            //         color: Colors.grey[800],
-            //       )
-            //     ],
-            //   ),
-            // ),
+              //       // account icon
+              //       Icon(
+              //         Icons.person,
+              //         size: 45,
+              //         color: Colors.grey[800],
+              //       )
+              //     ],
+              //   ),
+              // ),
 
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            // welcome home
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Welcome Home,",
-                    style: TextStyle(fontSize: 20, color: Colors.grey.shade800),
-                  ),
-                  Text(
-                    'Haikal Wijdan',
-                    style: GoogleFonts.bebasNeue(fontSize: 50),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 25),
-
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 40.0),
-              child: Divider(
-                thickness: 1,
-                color: Color.fromARGB(255, 204, 204, 204),
-              ),
-            ),
-
-            const SizedBox(height: 25),
-
-            // smart devices grid
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-              child: Text(
-                "Smart Devices",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24,
-                  color: Colors.grey.shade800,
+              // welcome home
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Welcome Home,",
+                      style:
+                          TextStyle(fontSize: 20, color: Colors.grey.shade800),
+                    ),
+                    Text(
+                      'Haikal Wijdan',
+                      style: GoogleFonts.bebasNeue(fontSize: 50),
+                    ),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(height: 10),
 
-            // grid
-            Expanded(
-              child: GridView.builder(
-                itemCount: 4,
+              const SizedBox(height: 25),
+
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 40.0),
+                child: Divider(
+                  thickness: 1,
+                  color: Color.fromARGB(255, 204, 204, 204),
+                ),
+              ),
+
+              const SizedBox(height: 25),
+
+              // smart devices grid
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                child: Text(
+                  "Smart Devices",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24,
+                    color: Colors.grey.shade800,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              // grid
+              GridView.builder(
+                shrinkWrap: true,
+                itemCount: mySmartDevices.length,
                 physics: const NeverScrollableScrollPhysics(),
                 padding: const EdgeInsets.symmetric(horizontal: 25),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -301,8 +303,44 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
               ),
-            )
-          ],
+
+              // Add spacing between grids
+              // const SizedBox(height: 20),
+
+              // Second grid (Repeat the structure for the second grid)
+              // Padding(
+              //   padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+              //   child: Text(
+              //     "Other Devices", // Change the title as needed
+              //     style: TextStyle(
+              //       fontWeight: FontWeight.bold,
+              //       fontSize: 24,
+              //       color: Colors.grey.shade800,
+              //     ),
+              //   ),
+              // ),
+              const SizedBox(height: 2),
+              GridView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount:
+                    1, // Update this count as per your second grid's data
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 1,
+                  childAspectRatio: 1 / 1.3,
+                ),
+                itemBuilder: (context, index) {
+                  return SmartDeviceBox(
+                    smartDeviceName: "Smart Device",
+                    iconPath: "lib/icons/light-bulb.png",
+                    powerOn: false,
+                    onChanged: (bool value) {},
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
       floatingActionButton: Padding(
