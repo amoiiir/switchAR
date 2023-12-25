@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../util/smart_device_box.dart';
+import '../util/sliderDevices.dart';
 import 'package:external_app_launcher/external_app_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // Import for json decoding
@@ -30,7 +31,12 @@ class _HomePageState extends State<HomePage> {
     ["Main Light", "lib/icons/light-bulb.png", false, "V2"],
     ["Yellow Light", "lib/icons/light-bulb.png", false, "V3"],
     ["Smart Fan", "lib/icons/fan.png", false, "V4"],
-    // ["Smart TV", "lib/icons/tv.png", false, "V5"]
+  ];
+
+  //for slider
+  List mySliderDevices = [
+    // [ smartDeviceName, iconPath , powerStatus ]
+    ["Side Light", "lib/icons/light-bulb.png", false, "V6"],
   ];
 
   // power button switched
@@ -210,30 +216,30 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Padding(
-              //   padding: EdgeInsets.symmetric(
-              //     horizontal: horizontalPadding,
-              //     vertical: verticalPadding,
-              //   ),
-              //   child: Row(
-              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //     children: [
-              //       // menu icon
-              //       Image.asset(
-              //         'lib/icons/menu.png',
-              //         height: 45,
-              //         color: Colors.grey[800],
-              //       ),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: horizontalPadding,
+                  vertical: verticalPadding,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // menu icon
+                    Image.asset(
+                      'lib/icons/menu.png',
+                      height: 45,
+                      color: Colors.grey[800],
+                    ),
 
-              //       // account icon
-              //       Icon(
-              //         Icons.person,
-              //         size: 45,
-              //         color: Colors.grey[800],
-              //       )
-              //     ],
-              //   ),
-              // ),
+                    // account icon
+                    Icon(
+                      Icons.person,
+                      size: 45,
+                      color: Colors.grey[800],
+                    )
+                  ],
+                ),
+              ),
 
               const SizedBox(height: 20),
 
@@ -280,7 +286,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 2),
 
               // grid
               GridView.builder(
@@ -319,23 +325,25 @@ class _HomePageState extends State<HomePage> {
               //     ),
               //   ),
               // ),
-              const SizedBox(height: 2),
+              const SizedBox(height: 0),
               GridView.builder(
                 shrinkWrap: true,
                 physics: NeverScrollableScrollPhysics(),
                 itemCount:
                     1, // Update this count as per your second grid's data
-                padding: const EdgeInsets.symmetric(horizontal: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 25),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 1,
-                  childAspectRatio: 1 / 1.3,
+                  childAspectRatio: 1.9 / 1,
                 ),
                 itemBuilder: (context, index) {
-                  return SmartDeviceBox(
-                    smartDeviceName: "Smart Device",
-                    iconPath: "lib/icons/light-bulb.png",
-                    powerOn: false,
-                    onChanged: (bool value) {},
+                  return sliderDevices(
+                    smartDeviceName: mySliderDevices[index][0],
+                    iconPath: mySliderDevices[index][1],
+                    powerOn: mySliderDevices[index][2],
+                    onChanged: (bool value) {
+                      toggleDevicePower(index, value);
+                    },
                   );
                 },
               ),
@@ -343,38 +351,38 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      floatingActionButton: Padding(
-        padding:
-            const EdgeInsets.all(40.0), // Adjust this padding value as needed
-        child: Container(
-          width: 80,
-          height: 80,
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            color: Color.fromARGB(255, 27, 28, 30),
-            boxShadow: [
-              BoxShadow(
-                color: Color.fromARGB(
-                    130, 237, 125, 58), // Customize the glow color
-                spreadRadius: 15, // Spread radius
-                blurRadius: 15, // Blur radius
-                offset: Offset(0, 0), // changes position of shadow
-              ),
-            ],
-          ),
-          child: FloatingActionButton(
-            onPressed: () async {
-              await LaunchApp.openApp(
-                androidPackageName: 'com.DefaultCompany.switchAR',
-                //if it installed, it will open, unless it will open playstore
-                openStore: true,
-              );
-            },
-            child: const Icon(Icons.add),
-          ),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      // floatingActionButton: Padding(
+      //   padding:
+      //       const EdgeInsets.all(40.0), // Adjust this padding value as needed
+      //   child: Container(
+      //     width: 80,
+      //     height: 80,
+      //     decoration: const BoxDecoration(
+      //       shape: BoxShape.circle,
+      //       color: Color.fromARGB(255, 27, 28, 30),
+      //       boxShadow: [
+      //         BoxShadow(
+      //           color: Color.fromARGB(
+      //               130, 237, 125, 58), // Customize the glow color
+      //           spreadRadius: 15, // Spread radius
+      //           blurRadius: 15, // Blur radius
+      //           offset: Offset(0, 0), // changes position of shadow
+      //         ),
+      //       ],
+      //     ),
+      //     child: FloatingActionButton(
+      //       onPressed: () async {
+      //         await LaunchApp.openApp(
+      //           androidPackageName: 'com.DefaultCompany.switchAR',
+      //           //if it installed, it will open, unless it will open playstore
+      //           openStore: true,
+      //         );
+      //       },
+      //       child: const Icon(Icons.add),
+      //     ),
+      //   ),
+      // ),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

@@ -1,0 +1,36 @@
+ Container(
+            padding: EdgeInsets.all(horizontalPadding),
+            child: SmartDeviceBox(
+              smartDeviceName: mySmartDevices[0][0], // Example: using the first device's data
+              iconPath: mySmartDevices[0][1],
+              powerOn: mySmartDevices[0][2],
+              onChanged: (bool value) {
+                toggleDevicePower(0, value); // Assuming index 0 for the first device
+              },
+            ),
+          ),
+        ],
+      ),
+    ),
+
+    GridView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount:
+                    1, // Update this count as per your second grid's data
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 1,
+                  childAspectRatio: 1 / 1.3,
+                ),
+                itemBuilder: (context, index) {
+                  return sliderDevices(
+                    smartDeviceName: mySliderDevices[index][0],
+                    iconPath: mySliderDevices[index][1],
+                    powerOn: mySliderDevices[index][2],
+                    onChanged: (bool value) {
+                      toggleDevicePower(index, value);
+                    },
+                  );
+                },
+              ),
