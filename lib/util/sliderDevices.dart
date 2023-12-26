@@ -58,6 +58,7 @@ class sliderDevices extends StatelessWidget {
                     onChanged: onChanged, // Use onChanged directly
                     min: 0.0,
                     max: 225.0,
+                    inactiveColor: Colors.grey.shade700,
                     activeColor: Colors.green,
                   ),
                 ],
