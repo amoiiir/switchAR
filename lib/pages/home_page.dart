@@ -36,7 +36,7 @@ class _HomePageState extends State<HomePage> {
   //for slider
   List mySliderDevices = [
     // [ smartDeviceName, iconPath , powerStatus ]
-    ["Side Light", "lib/icons/light-bulb.png", false, "V6"],
+    ["Side Light", "lib/icons/light-bulb.png", 0.0, "V6"],
   ];
 
   // power button switched
@@ -57,6 +57,33 @@ class _HomePageState extends State<HomePage> {
     String token = "NBFTcjxflna3kYS55nd5KLRAmcfDMUfi";
     String devicePin = mySmartDevices[index][3];
     int value = mySmartDevices[index][2] ? 1 : 0;
+
+    String url =
+        "https://blynk.cloud/external/api/update?token=$token&$devicePin=$value";
+
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        // Handle successful response
+      } else {
+        // Handle error
+      }
+    } catch (e) {
+      // Handle network error
+    }
+  }
+
+  //device power for slider
+  // Function to toggle device power and make API call
+  void toggleDeviceSlider(int index, double newState) async {
+    setState(() {
+      // mySmartDevices[index][2] = !mySmartDevices[index][2];
+      mySliderDevices[index][2] = newState;
+    });
+
+    String token = "NBFTcjxflna3kYS55nd5KLRAmcfDMUfi";
+    String devicePin = mySliderDevices[index][3];
+    int value = mySliderDevices[index][2] ? 1 : 0;
 
     String url =
         "https://blynk.cloud/external/api/update?token=$token&$devicePin=$value";
@@ -341,8 +368,8 @@ class _HomePageState extends State<HomePage> {
                     smartDeviceName: mySliderDevices[index][0],
                     iconPath: mySliderDevices[index][1],
                     powerOn: mySliderDevices[index][2],
-                    onChanged: (bool value) {
-                      toggleDevicePower(index, value);
+                    onChanged: (double value) {
+                      toggleDeviceSlider(index, value);
                     },
                   );
                 },
