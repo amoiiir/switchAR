@@ -24,6 +24,9 @@ class _HomePageState extends State<HomePage> {
   Timer? _pollingTimer;
   WebSocketChannel? channel;
 
+  //weather
+  String weatherData = "Loading...";
+
   // list of smart devices
   List mySmartDevices = [
     // [ smartDeviceName, iconPath , powerStatus ]
@@ -38,6 +41,14 @@ class _HomePageState extends State<HomePage> {
     // [ smartDeviceName, iconPath , powerStatus ]
     ["Side Light", "lib/icons/light-bulb.png", 0.0, "V6"],
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    initializeDeviceStates();
+    _startPolling();
+    fetchWeatherData();
+  }
 
   // power button switched
   void powerSwitchChanged(bool value, int index) {
@@ -77,13 +88,14 @@ class _HomePageState extends State<HomePage> {
   // Function to toggle device power and make API call
   void toggleDeviceSlider(int index, double newState) async {
     setState(() {
-      // mySmartDevices[index][2] = !mySmartDevices[index][2];
       mySliderDevices[index][2] = newState;
     });
 
     String token = "NBFTcjxflna3kYS55nd5KLRAmcfDMUfi";
     String devicePin = mySliderDevices[index][3];
-    int value = mySliderDevices[index][2] ? 1 : 0;
+
+    // Ensure the value is within 0 to 225 range
+    int value = newState.round().clamp(0, 225);
 
     String url =
         "https://blynk.cloud/external/api/update?token=$token&$devicePin=$value";
@@ -97,6 +109,28 @@ class _HomePageState extends State<HomePage> {
       }
     } catch (e) {
       // Handle network error
+    }
+  }
+
+  Future<void> fetchWeatherData() async {
+    try {
+      final response = await http.get(Uri.parse(
+          'https://blynk.cloud/external/api/get?token=NBFTcjxflna3kYS55nd5KLRAmcfDMUfi&V7'));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          weatherData =
+              data.toString(); // Adjust based on the API response format
+        });
+      } else {
+        setState(() {
+          weatherData = "Failed to fetch weather data";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        weatherData = "Error: $e";
+      });
     }
   }
 
@@ -222,13 +256,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    initializeDeviceStates();
-    _startPolling();
-  }
-
-  @override
   void dispose() {
     _pollingTimer?.cancel();
     super.dispose();
@@ -281,9 +308,21 @@ class _HomePageState extends State<HomePage> {
                       style:
                           TextStyle(fontSize: 20, color: Colors.grey.shade800),
                     ),
-                    Text(
-                      'Haikal Wijdan',
-                      style: GoogleFonts.bebasNeue(fontSize: 50),
+                    Row(
+                      children: [
+                        Text(
+                          'Haikal Wijdan',
+                          style: GoogleFonts.bebasNeue(fontSize: 50),
+                        ),
+                        SizedBox(
+                            width:
+                                20), // Space between the name and weather data
+                        Text(
+                          "$weatherData",
+                          style: TextStyle(
+                              fontSize: 30, color: Colors.grey.shade800),
+                        ),
+                      ],
                     ),
                   ],
                 ),
