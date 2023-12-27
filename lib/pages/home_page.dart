@@ -320,7 +320,7 @@ class _HomePageState extends State<HomePage> {
                         Text(
                           "$weatherData",
                           style: TextStyle(
-                              fontSize: 30, color: Colors.grey.shade800),
+                              fontSize: 25, color: Colors.grey.shade800),
                         ),
                       ],
                     ),
