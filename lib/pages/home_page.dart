@@ -232,6 +232,7 @@ class _HomePageState extends State<HomePage> {
                     borderRadius: BorderRadius.circular(
                         10), // Adjust border radius for desired roundness
                   ),
+                  color: Colors.grey[100],
                   child: Padding(
                     padding: const EdgeInsets.all(
                         30.0), // Adjust padding inside the card
