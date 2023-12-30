@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../util/smart_device_box.dart';
 import '../util/sliderDevices.dart';
+import '../util/temperature_control.dart';
 import 'package:external_app_launcher/external_app_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // Import for json decoding
@@ -19,10 +20,8 @@ class _HomePageState extends State<HomePage> {
   final double horizontalPadding = 40;
   final double verticalPadding = 25;
   String weatherData = "Loading...";
-  Timer? _pollingTimer;
   final String token = "3dZX49-NzPVihXqUUIMvYRPCQD-4jVK5";
   final List<String> virtualPins = ['V1', 'V2', 'V3', 'V4', 'V6'];
-  WebSocketChannel? channel;
   Timer? _timer;
 
   // list of smart devices
@@ -158,22 +157,8 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void sendMessage(String message) {
-    if (channel != null) {
-      channel!.sink.add(message);
-    }
-  }
-
-  void disposeWebSocket() {
-    if (channel != null) {
-      channel!.sink.close();
-      channel = null;
-    }
-  }
-
   @override
   void dispose() {
-    _pollingTimer?.cancel();
     _timer?.cancel();
     super.dispose();
   }
@@ -331,6 +316,15 @@ class _HomePageState extends State<HomePage> {
                     },
                   );
                 },
+              ),
+              const SizedBox(height: 20),
+              // Temperature Control
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                child: TemperatureControl(
+                  token: "3dZX49-NzPVihXqUUIMvYRPCQD-4jVK5",
+                  pin: "V8",
+                ),
               ),
             ],
           ),
