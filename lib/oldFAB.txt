@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../util/smart_device_box.dart';
+import '../util/sliderDevices.dart';
 import 'package:external_app_launcher/external_app_launcher.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert'; // Import for json decoding
@@ -23,6 +24,9 @@ class _HomePageState extends State<HomePage> {
   Timer? _pollingTimer;
   WebSocketChannel? channel;
 
+  //weather
+  String weatherData = "Loading...";
+
   // list of smart devices
   List mySmartDevices = [
     // [ smartDeviceName, iconPath , powerStatus ]
@@ -31,6 +35,20 @@ class _HomePageState extends State<HomePage> {
     ["Yellow Light", "lib/icons/light-bulb.png", false, "V3"],
     ["Smart Fan", "lib/icons/fan.png", false, "V4"],
   ];
+
+  //for slider
+  List mySliderDevices = [
+    // [ smartDeviceName, iconPath , powerStatus ]
+    ["Side Light", "lib/icons/light-bulb.png", 0.0, "V6"],
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    initializeDeviceStates();
+    _startPolling();
+    fetchWeatherData();
+  }
 
   // power button switched
   void powerSwitchChanged(bool value, int index) {
@@ -63,6 +81,56 @@ class _HomePageState extends State<HomePage> {
       }
     } catch (e) {
       // Handle network error
+    }
+  }
+
+  //device power for slider
+  // Function to toggle device power and make API call
+  void toggleDeviceSlider(int index, double newState) async {
+    setState(() {
+      mySliderDevices[index][2] = newState;
+    });
+
+    String token = "NBFTcjxflna3kYS55nd5KLRAmcfDMUfi";
+    String devicePin = mySliderDevices[index][3];
+
+    // Ensure the value is within 0 to 225 range
+    int value = newState.round().clamp(0, 225);
+
+    String url =
+        "https://blynk.cloud/external/api/update?token=$token&$devicePin=$value";
+
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        // Handle successful response
+      } else {
+        // Handle error
+      }
+    } catch (e) {
+      // Handle network error
+    }
+  }
+
+  Future<void> fetchWeatherData() async {
+    try {
+      final response = await http.get(Uri.parse(
+          'https://blynk.cloud/external/api/get?token=NBFTcjxflna3kYS55nd5KLRAmcfDMUfi&V7'));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          weatherData =
+              data.toString(); // Adjust based on the API response format
+        });
+      } else {
+        setState(() {
+          weatherData = "Failed to fetch weather data";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        weatherData = "Error: $e";
+      });
     }
   }
 
@@ -188,13 +256,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    initializeDeviceStates();
-    _startPolling();
-  }
-
-  @override
   void dispose() {
     _pollingTimer?.cancel();
     super.dispose();
@@ -205,85 +266,98 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Colors.grey[300],
       body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // appbar:
-            // Padding(
-            //   padding: EdgeInsets.symmetric(
-            //     horizontal: horizontalPadding,
-            //     vertical: verticalPadding,
-            //   ),
-            //   child: Row(
-            //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            //     children: [
-            //       // menu icon
-            //       Image.asset(
-            //         'lib/icons/menu.png',
-            //         height: 45,
-            //         color: Colors.grey[800],
-            //       ),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: horizontalPadding,
+                  vertical: verticalPadding,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // menu icon
+                    Image.asset(
+                      'lib/icons/menu.png',
+                      height: 45,
+                      color: Colors.grey[800],
+                    ),
 
-            //       // account icon
-            //       Icon(
-            //         Icons.person,
-            //         size: 45,
-            //         color: Colors.grey[800],
-            //       )
-            //     ],
-            //   ),
-            // ),
-
-            const SizedBox(height: 20),
-
-            // welcome home
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Welcome Home,",
-                    style: TextStyle(fontSize: 20, color: Colors.grey.shade800),
-                  ),
-                  Text(
-                    'Haikal Wijdan',
-                    style: GoogleFonts.bebasNeue(fontSize: 50),
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 25),
-
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 40.0),
-              child: Divider(
-                thickness: 1,
-                color: Color.fromARGB(255, 204, 204, 204),
-              ),
-            ),
-
-            const SizedBox(height: 25),
-
-            // smart devices grid
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-              child: Text(
-                "Smart Devices",
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24,
-                  color: Colors.grey.shade800,
+                    // account icon
+                    Icon(
+                      Icons.person,
+                      size: 45,
+                      color: Colors.grey[800],
+                    )
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(height: 10),
 
-            // grid
-            Expanded(
-              child: GridView.builder(
-                itemCount: 4,
+              const SizedBox(height: 20),
+
+              // welcome home
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "Welcome Home,",
+                      style:
+                          TextStyle(fontSize: 20, color: Colors.grey.shade800),
+                    ),
+                    Row(
+                      children: [
+                        Text(
+                          'Haikal Wijdan',
+                          style: GoogleFonts.bebasNeue(fontSize: 50),
+                        ),
+                        SizedBox(
+                            width:
+                                20), // Space between the name and weather data
+                        Text(
+                          "$weatherData",
+                          style: TextStyle(
+                              fontSize: 25, color: Colors.grey.shade800),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 25),
+
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 40.0),
+                child: Divider(
+                  thickness: 1,
+                  color: Color.fromARGB(255, 204, 204, 204),
+                ),
+              ),
+
+              const SizedBox(height: 25),
+
+              // smart devices grid
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                child: Text(
+                  "Smart Devices",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 24,
+                    color: Colors.grey.shade800,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 2),
+
+              // grid
+              GridView.builder(
+                shrinkWrap: true,
+                itemCount: mySmartDevices.length,
                 physics: const NeverScrollableScrollPhysics(),
                 padding: const EdgeInsets.symmetric(horizontal: 25),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
@@ -301,42 +375,80 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
               ),
-            )
-          ],
-        ),
-      ),
-      floatingActionButton: Padding(
-        padding:
-            const EdgeInsets.all(40.0), // Adjust this padding value as needed
-        child: Container(
-          width: 80,
-          height: 80,
-          decoration: const BoxDecoration(
-            shape: BoxShape.circle,
-            color: Color.fromARGB(255, 27, 28, 30),
-            boxShadow: [
-              BoxShadow(
-                color: Color.fromARGB(
-                    130, 237, 125, 58), // Customize the glow color
-                spreadRadius: 15, // Spread radius
-                blurRadius: 15, // Blur radius
-                offset: Offset(0, 0), // changes position of shadow
+
+              // Add spacing between grids
+              // const SizedBox(height: 20),
+
+              // Second grid (Repeat the structure for the second grid)
+              // Padding(
+              //   padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+              //   child: Text(
+              //     "Other Devices", // Change the title as needed
+              //     style: TextStyle(
+              //       fontWeight: FontWeight.bold,
+              //       fontSize: 24,
+              //       color: Colors.grey.shade800,
+              //     ),
+              //   ),
+              // ),
+              const SizedBox(height: 0),
+              GridView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount:
+                    1, // Update this count as per your second grid's data
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 1,
+                  childAspectRatio: 1.9 / 1,
+                ),
+                itemBuilder: (context, index) {
+                  return sliderDevices(
+                    smartDeviceName: mySliderDevices[index][0],
+                    iconPath: mySliderDevices[index][1],
+                    powerOn: mySliderDevices[index][2],
+                    onChanged: (double value) {
+                      toggleDeviceSlider(index, value);
+                    },
+                  );
+                },
               ),
             ],
           ),
-          child: FloatingActionButton(
-            onPressed: () async {
-              await LaunchApp.openApp(
-                androidPackageName: 'com.DefaultCompany.switchAR',
-                //if it installed, it will open, unless it will open playstore
-                openStore: true,
-              );
-            },
-            child: const Icon(Icons.add),
-          ),
         ),
       ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      // floatingActionButton: Padding(
+      //   padding:
+      //       const EdgeInsets.all(40.0), // Adjust this padding value as needed
+      //   child: Container(
+      //     width: 80,
+      //     height: 80,
+      //     decoration: const BoxDecoration(
+      //       shape: BoxShape.circle,
+      //       color: Color.fromARGB(255, 27, 28, 30),
+      //       boxShadow: [
+      //         BoxShadow(
+      //           color: Color.fromARGB(
+      //               130, 237, 125, 58), // Customize the glow color
+      //           spreadRadius: 15, // Spread radius
+      //           blurRadius: 15, // Blur radius
+      //           offset: Offset(0, 0), // changes position of shadow
+      //         ),
+      //       ],
+      //     ),
+      //     child: FloatingActionButton(
+      //       onPressed: () async {
+      //         await LaunchApp.openApp(
+      //           androidPackageName: 'com.DefaultCompany.switchAR',
+      //           //if it installed, it will open, unless it will open playstore
+      //           openStore: true,
+      //         );
+      //       },
+      //       child: const Icon(Icons.add),
+      //     ),
+      //   ),
+      // ),
+      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

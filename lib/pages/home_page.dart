@@ -16,16 +16,14 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  // padding constants
   final double horizontalPadding = 40;
   final double verticalPadding = 25;
-
-  //polling timer
-  Timer? _pollingTimer;
-  WebSocketChannel? channel;
-
-  //weather
   String weatherData = "Loading...";
+  Timer? _pollingTimer;
+  final String token = "3dZX49-NzPVihXqUUIMvYRPCQD-4jVK5";
+  final List<String> virtualPins = ['V1', 'V2', 'V3', 'V4', 'V6'];
+  WebSocketChannel? channel;
+  Timer? _timer;
 
   // list of smart devices
   List mySmartDevices = [
@@ -45,9 +43,29 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    initializeDeviceStates();
-    _startPolling();
     fetchWeatherData();
+    _startRepeatedFetching();
+  }
+
+  Future<void> syncDeviceStates() async {
+    for (String pin in virtualPins) {
+      String url = 'https://blynk.cloud/external/api/get?token=$token&$pin';
+      try {
+        var response = await http.get(Uri.parse(url));
+        if (response.statusCode == 200) {
+          bool isOn = response.body.trim() == '1';
+          int deviceIndex =
+              mySmartDevices.indexWhere((device) => device[3] == pin);
+          if (deviceIndex != -1) {
+            setState(() {
+              mySmartDevices[deviceIndex][2] = isOn;
+            });
+          }
+        }
+      } catch (e) {
+        print("Error fetching state for pin $pin: $e");
+      }
+    }
   }
 
   // power button switched
@@ -65,7 +83,7 @@ class _HomePageState extends State<HomePage> {
       mySmartDevices[index][2] = newState;
     });
 
-    String token = "NBFTcjxflna3kYS55nd5KLRAmcfDMUfi";
+    String token = "3dZX49-NzPVihXqUUIMvYRPCQD-4jVK5";
     String devicePin = mySmartDevices[index][3];
     int value = mySmartDevices[index][2] ? 1 : 0;
 
@@ -91,7 +109,7 @@ class _HomePageState extends State<HomePage> {
       mySliderDevices[index][2] = newState;
     });
 
-    String token = "NBFTcjxflna3kYS55nd5KLRAmcfDMUfi";
+    String token = "3dZX49-NzPVihXqUUIMvYRPCQD-4jVK5";
     String devicePin = mySliderDevices[index][3];
 
     // Ensure the value is within 0 to 225 range
@@ -112,10 +130,16 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void _startRepeatedFetching() {
+    // Set up a timer that calls fetchWeatherData every 2 seconds
+    _timer =
+        Timer.periodic(Duration(seconds: 2), (Timer t) => fetchWeatherData());
+  }
+
   Future<void> fetchWeatherData() async {
     try {
       final response = await http.get(Uri.parse(
-          'https://blynk.cloud/external/api/get?token=NBFTcjxflna3kYS55nd5KLRAmcfDMUfi&V7'));
+          'https://blynk.cloud/external/api/get?token=3dZX49-NzPVihXqUUIMvYRPCQD-4jVK5&V7'));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         setState(() {
@@ -134,106 +158,6 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // Function to get the current state of a Blynk virtual pin
-  Future<String> getBlynkPinValue(String token, String devicePin) async {
-    final url = Uri.parse('http://blynk-cloud.com/$token/get/$devicePin');
-    final response = await http.get(url);
-
-    if (response.statusCode == 200) {
-      return json.decode(response.body)[0];
-    } else {
-      throw Exception('Failed to load pin value');
-    }
-  }
-
-  // Function to initialize the states of devices
-  void initializeDeviceStates() async {
-    String token = "NBFTcjxflna3kYS55nd5KLRAmcfDMUfi";
-    for (int i = 0; i < mySmartDevices.length; i++) {
-      try {
-        String pinValue = await getBlynkPinValue(token, mySmartDevices[i][3]);
-        bool isOn = pinValue == "1";
-        if (mySmartDevices[i][2] != isOn) {
-          setState(() {
-            mySmartDevices[i][2] = isOn;
-          });
-        }
-      } catch (e) {
-        print('Error fetching pin value: $e'); // Log the error
-      }
-    }
-  }
-
-  void _startPolling() {
-    _pollingTimer = Timer.periodic(
-        Duration(seconds: 10), (Timer t) => initializeDeviceStates());
-  }
-
-  Future<void> pollBlynkAPI() async {
-    String token = "NBFTcjxflna3kYS55nd5KLRAmcfDMUfi";
-    for (int i = 0; i < mySmartDevices.length; i++) {
-      try {
-        String pinValue = await getBlynkPinValue(token, mySmartDevices[i][3]);
-        print(
-            "Device: ${mySmartDevices[i][0]}, Blynk API Value: $pinValue"); // Log API value
-        bool isOn = pinValue == "1";
-        if (mySmartDevices[i][2] != isOn) {
-          print(
-              "Updating state for ${mySmartDevices[i][0]}"); // Log state update
-          setState(() {
-            mySmartDevices[i][2] = isOn;
-          });
-        }
-      } catch (e) {
-        print("Error polling Blynk API: $e"); // Log errors
-      }
-    }
-  }
-
-  //websocket function
-  void connectToWebSocket() {
-    channel = WebSocketChannel.connect(
-      Uri.parse(
-          ' ws://blynk-cloud.com:8082/websockets'), // Replace with your WebSocket URL
-    );
-
-    channel!.stream.listen(
-      (message) {
-        // Handle incoming messages
-        processMessage(message);
-      },
-      onDone: () {
-        // Handle WebSocket closing
-      },
-      onError: (error) {
-        // Handle errors
-        print(error);
-      },
-    );
-  }
-
-  void processMessage(dynamic message) {
-    // Assuming 'message' is a JSON string with information about device states
-    // Example message format: {"devicePin": "V1", "state": "1"}
-
-    try {
-      Map<String, dynamic> messageData = json.decode(message);
-      String devicePin = messageData['devicePin'];
-      bool isOn = messageData['state'] == "1";
-
-      // Find the device in your list and update its state
-      int deviceIndex =
-          mySmartDevices.indexWhere((device) => device[3] == devicePin);
-      if (deviceIndex != -1) {
-        setState(() {
-          mySmartDevices[deviceIndex][2] = isOn;
-        });
-      }
-    } catch (e) {
-      print("Error processing message: $e");
-    }
-  }
-
   void sendMessage(String message) {
     if (channel != null) {
       channel!.sink.add(message);
@@ -247,17 +171,10 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  int _selectedIndex = 0;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
   @override
   void dispose() {
     _pollingTimer?.cancel();
+    _timer?.cancel();
     super.dispose();
   }
 
@@ -279,18 +196,27 @@ class _HomePageState extends State<HomePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     // menu icon
-                    Image.asset(
-                      'lib/icons/menu.png',
-                      height: 45,
-                      color: Colors.grey[800],
+                    Text(
+                      "$weatherData °C",
+                      style:
+                          TextStyle(fontSize: 25, color: Colors.grey.shade800),
                     ),
 
                     // account icon
-                    Icon(
-                      Icons.person,
-                      size: 45,
+                    IconButton(
                       color: Colors.grey[800],
-                    )
+                      onPressed: () async {
+                        await LaunchApp.openApp(
+                          androidPackageName: 'com.DefaultCompany.switchAR',
+                          //if it installed, it will open, unless it will open playstore
+                          openStore: true,
+                        );
+                      },
+                      icon: const Icon(
+                        Icons.camera_alt_rounded,
+                        size: 45.0, // Increase the size as per your requirement
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -300,31 +226,34 @@ class _HomePageState extends State<HomePage> {
               // welcome home
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      "Welcome Home,",
-                      style:
-                          TextStyle(fontSize: 20, color: Colors.grey.shade800),
-                    ),
-                    Row(
+                child: Card(
+                  elevation: 4, // Adjust elevation for desired shadow effect
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(
+                        10), // Adjust border radius for desired roundness
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(
+                        30.0), // Adjust padding inside the card
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Haikal Wijdan',
-                          style: GoogleFonts.bebasNeue(fontSize: 50),
-                        ),
-                        SizedBox(
-                            width:
-                                20), // Space between the name and weather data
-                        Text(
-                          "$weatherData",
+                          "Welcome Home,",
                           style: TextStyle(
-                              fontSize: 25, color: Colors.grey.shade800),
+                              fontSize: 20, color: Colors.grey.shade800),
+                        ),
+                        Row(
+                          children: [
+                            Text(
+                              'Haikal Wijdan',
+                              style: GoogleFonts.bebasNeue(fontSize: 50),
+                            ),
+                          ],
                         ),
                       ],
                     ),
-                  ],
+                  ),
                 ),
               ),
 
@@ -380,17 +309,6 @@ class _HomePageState extends State<HomePage> {
               // const SizedBox(height: 20),
 
               // Second grid (Repeat the structure for the second grid)
-              // Padding(
-              //   padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-              //   child: Text(
-              //     "Other Devices", // Change the title as needed
-              //     style: TextStyle(
-              //       fontWeight: FontWeight.bold,
-              //       fontSize: 24,
-              //       color: Colors.grey.shade800,
-              //     ),
-              //   ),
-              // ),
               const SizedBox(height: 0),
               GridView.builder(
                 shrinkWrap: true,
@@ -417,38 +335,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      // floatingActionButton: Padding(
-      //   padding:
-      //       const EdgeInsets.all(40.0), // Adjust this padding value as needed
-      //   child: Container(
-      //     width: 80,
-      //     height: 80,
-      //     decoration: const BoxDecoration(
-      //       shape: BoxShape.circle,
-      //       color: Color.fromARGB(255, 27, 28, 30),
-      //       boxShadow: [
-      //         BoxShadow(
-      //           color: Color.fromARGB(
-      //               130, 237, 125, 58), // Customize the glow color
-      //           spreadRadius: 15, // Spread radius
-      //           blurRadius: 15, // Blur radius
-      //           offset: Offset(0, 0), // changes position of shadow
-      //         ),
-      //       ],
-      //     ),
-      //     child: FloatingActionButton(
-      //       onPressed: () async {
-      //         await LaunchApp.openApp(
-      //           androidPackageName: 'com.DefaultCompany.switchAR',
-      //           //if it installed, it will open, unless it will open playstore
-      //           openStore: true,
-      //         );
-      //       },
-      //       child: const Icon(Icons.add),
-      //     ),
-      //   ),
-      // ),
-      // floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }
