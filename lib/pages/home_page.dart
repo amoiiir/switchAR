@@ -291,6 +291,15 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
 
+              // Temperature Control
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                child: TemperatureControl(
+                  token: "3dZX49-NzPVihXqUUIMvYRPCQD-4jVK5",
+                  pin: "V8",
+                ),
+              ),
+
               // Add spacing between grids
               // const SizedBox(height: 20),
 
@@ -318,14 +327,6 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
               const SizedBox(height: 20),
-              // Temperature Control
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                child: TemperatureControl(
-                  token: "3dZX49-NzPVihXqUUIMvYRPCQD-4jVK5",
-                  pin: "V8",
-                ),
-              ),
             ],
           ),
         ),

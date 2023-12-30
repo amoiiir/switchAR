@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:async'; // Import for using Timer
 
 class TemperatureControl extends StatefulWidget {
   final String token;
@@ -17,11 +18,17 @@ class TemperatureControl extends StatefulWidget {
 
 class _TemperatureControlState extends State<TemperatureControl> {
   double currentTemperature = 0.0;
+  Timer? _temperatureFetchTimer;
 
   @override
   void initState() {
     super.initState();
     fetchCurrentTemperature();
+    _startRepeatedFetching();
+  }
+
+  void _startRepeatedFetching() {
+    _temperatureFetchTimer = Timer.periodic(Duration(seconds: 10), (Timer t) => fetchCurrentTemperature());
   }
 
   Future<void> fetchCurrentTemperature() async {
@@ -29,9 +36,12 @@ class _TemperatureControlState extends State<TemperatureControl> {
     try {
       var response = await http.get(Uri.parse(getUrl));
       if (response.statusCode == 200) {
-        setState(() {
-          currentTemperature = double.parse(response.body);
-        });
+        double fetchedTemperature = double.parse(response.body);
+        if (fetchedTemperature != currentTemperature) {
+          setState(() {
+            currentTemperature = fetchedTemperature;
+          });
+        }
       }
     } catch (e) {
       print("Error fetching temperature: $e");
@@ -43,16 +53,19 @@ class _TemperatureControlState extends State<TemperatureControl> {
     try {
       final response = await http.get(Uri.parse(updateUrl));
       if (response.statusCode == 200) {
-        // Success response handling
         print("Temperature updated to $newTemperature");
       } else {
-        // Error handling
         print("Failed to update temperature. Status code: ${response.statusCode}");
       }
     } catch (e) {
-      // Network error handling
       print("Error updating temperature: $e");
     }
+  }
+
+  @override
+  void dispose() {
+    _temperatureFetchTimer?.cancel();
+    super.dispose();
   }
 
   @override
