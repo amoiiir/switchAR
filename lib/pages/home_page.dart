@@ -19,9 +19,11 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final double horizontalPadding = 40;
   final double verticalPadding = 25;
+  Timer? _pollingTimer;
   String weatherData = "Loading...";
-  final String token = "3dZX49-NzPVihXqUUIMvYRPCQD-4jVK5";
+  final String token = "NBFTcjxflna3kYS55nd5KLRAmcfDMUfi";
   final List<String> virtualPins = ['V1', 'V2', 'V3', 'V4', 'V6'];
+  WebSocketChannel? channel;
   Timer? _timer;
 
   // list of smart devices
@@ -44,6 +46,11 @@ class _HomePageState extends State<HomePage> {
     super.initState();
     fetchWeatherData();
     _startRepeatedFetching();
+    startPolling();
+  }
+
+  void startPolling() {
+    _pollingTimer = Timer.periodic(Duration(seconds: 5), (_) => syncDeviceStates());
   }
 
   Future<void> syncDeviceStates() async {
@@ -82,7 +89,7 @@ class _HomePageState extends State<HomePage> {
       mySmartDevices[index][2] = newState;
     });
 
-    String token = "3dZX49-NzPVihXqUUIMvYRPCQD-4jVK5";
+    String token = "NBFTcjxflna3kYS55nd5KLRAmcfDMUfi";
     String devicePin = mySmartDevices[index][3];
     int value = mySmartDevices[index][2] ? 1 : 0;
 
@@ -108,7 +115,7 @@ class _HomePageState extends State<HomePage> {
       mySliderDevices[index][2] = newState;
     });
 
-    String token = "3dZX49-NzPVihXqUUIMvYRPCQD-4jVK5";
+    String token = "NBFTcjxflna3kYS55nd5KLRAmcfDMUfi";
     String devicePin = mySliderDevices[index][3];
 
     // Ensure the value is within 0 to 225 range
@@ -138,7 +145,7 @@ class _HomePageState extends State<HomePage> {
   Future<void> fetchWeatherData() async {
     try {
       final response = await http.get(Uri.parse(
-          'https://blynk.cloud/external/api/get?token=3dZX49-NzPVihXqUUIMvYRPCQD-4jVK5&V7'));
+          'https://blynk.cloud/external/api/get?token=NBFTcjxflna3kYS55nd5KLRAmcfDMUfi&V7'));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         setState(() {
@@ -157,8 +164,53 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  void processMessage(dynamic message) {
+    // Assuming 'message' is a JSON string with information about device states
+    // Example message format: {"devicePin": "V1", "state": "1"}
+
+    try {
+      Map<String, dynamic> messageData = json.decode(message);
+      String devicePin = messageData['devicePin'];
+      bool isOn = messageData['state'] == "1";
+
+      // Find the device in your list and update its state
+      int deviceIndex =
+          mySmartDevices.indexWhere((device) => device[3] == devicePin);
+      if (deviceIndex != -1) {
+        setState(() {
+          mySmartDevices[deviceIndex][2] = isOn;
+        });
+      }
+    } catch (e) {
+      print("Error processing message: $e");
+    }
+  }
+
+  void sendMessage(String message) {
+    if (channel != null) {
+      channel!.sink.add(message);
+    }
+  }
+
+  void disposeWebSocket() {
+    if (channel != null) {
+      channel!.sink.close();
+      channel = null;
+    }
+  }
+
+  int _selectedIndex = 0;
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+
   @override
   void dispose() {
+    _pollingTimer?.cancel();
     _timer?.cancel();
     super.dispose();
   }
@@ -295,7 +347,7 @@ class _HomePageState extends State<HomePage> {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
                 child: TemperatureControl(
-                  token: "3dZX49-NzPVihXqUUIMvYRPCQD-4jVK5",
+                  token: "NBFTcjxflna3kYS55nd5KLRAmcfDMUfi",
                   pin: "V8",
                 ),
               ),
