@@ -20,6 +20,7 @@ class _HomePageState extends State<HomePage> {
   final double horizontalPadding = 40;
   final double verticalPadding = 25;
   Timer? _pollingTimer;
+  Timer? _sliderTimer;
   String weatherData = "Loading...";
   final String token = "NBFTcjxflna3kYS55nd5KLRAmcfDMUfi";
   final List<String> virtualPins = ['V1', 'V2', 'V3', 'V4', 'V6'];
@@ -47,7 +48,8 @@ class _HomePageState extends State<HomePage> {
     fetchWeatherData();
     _startRepeatedFetching();
     startPolling();
-    fetchSliderValue();
+    // fetchSliderValue();
+    sliderPolling();
   }
 
   void startPolling() {
@@ -67,6 +69,33 @@ class _HomePageState extends State<HomePage> {
           if (deviceIndex != -1) {
             setState(() {
               mySmartDevices[deviceIndex][2] = isOn;
+            });
+          }
+        }
+      } catch (e) {
+        print("Error fetching state for pin $pin: $e");
+      }
+    }
+  }
+
+  //sync slider
+  void sliderPolling() {
+    _sliderTimer =
+        Timer.periodic(Duration(seconds: 5), (_) => syncSlider());
+  }
+
+  Future<void> syncSlider() async {
+    for (String pin in virtualPins) {
+      String url = 'https://blynk.cloud/external/api/get?token=$token&$pin';
+      try {
+        var response = await http.get(Uri.parse(url));
+        if (response.statusCode == 200) {
+          double sliderValue = double.parse(response.body.trim());
+          int deviceIndex =
+              mySliderDevices.indexWhere((device) => device[3] == pin);
+          if (deviceIndex != -1) {
+            setState(() {
+              mySliderDevices[deviceIndex][2] = sliderValue;
             });
           }
         }
@@ -173,26 +202,26 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  //fetchslider
-  Future<void> fetchSliderValue() async {
-    String pin = "V6"; // The pin for the slider
-    String url = 'https://blynk.cloud/external/api/get?token=$token&$pin';
-    try {
-      var response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        double sliderValue = double.parse(response.body);
-        int sliderDeviceIndex =
-            mySliderDevices.indexWhere((device) => device[3] == pin);
-        if (sliderDeviceIndex != -1) {
-          setState(() {
-            mySliderDevices[sliderDeviceIndex][2] = sliderValue;
-          });
-        }
-      }
-    } catch (e) {
-      print("Error fetching slider value for pin $pin: $e");
-    }
-  }
+  // //fetchslider
+  // Future<void> fetchSliderValue() async {
+  //   String pin = "V6"; // The pin for the slider
+  //   String url = 'https://blynk.cloud/external/api/get?token=$token&$pin';
+  //   try {
+  //     var response = await http.get(Uri.parse(url));
+  //     if (response.statusCode == 200) {
+  //       double sliderValue = double.parse(response.body);
+  //       int sliderDeviceIndex =
+  //           mySliderDevices.indexWhere((device) => device[3] == pin);
+  //       if (sliderDeviceIndex != -1) {
+  //         setState(() {
+  //           mySliderDevices[sliderDeviceIndex][2] = sliderValue;
+  //         });
+  //       }
+  //     }
+  //   } catch (e) {
+  //     print("Error fetching slider value for pin $pin: $e");
+  //   }
+  // }
 
   void processMessage(dynamic message) {
     // Assuming 'message' is a JSON string with information about device states
@@ -227,14 +256,6 @@ class _HomePageState extends State<HomePage> {
       channel!.sink.close();
       channel = null;
     }
-  }
-
-  int _selectedIndex = 0;
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
   }
 
   @override
