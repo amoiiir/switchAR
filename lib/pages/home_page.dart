@@ -47,10 +47,12 @@ class _HomePageState extends State<HomePage> {
     fetchWeatherData();
     _startRepeatedFetching();
     startPolling();
+    fetchSliderValue();
   }
 
   void startPolling() {
-    _pollingTimer = Timer.periodic(Duration(seconds: 5), (_) => syncDeviceStates());
+    _pollingTimer =
+        Timer.periodic(Duration(seconds: 5), (_) => syncDeviceStates());
   }
 
   Future<void> syncDeviceStates() async {
@@ -147,11 +149,18 @@ class _HomePageState extends State<HomePage> {
       final response = await http.get(Uri.parse(
           'https://blynk.cloud/external/api/get?token=NBFTcjxflna3kYS55nd5KLRAmcfDMUfi&V7'));
       if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        setState(() {
-          weatherData =
-              data.toString(); // Adjust based on the API response format
-        });
+        final String responseBody = response.body.trim();
+        // Check if the response body is a valid double
+        if (double.tryParse(responseBody) != null) {
+          final double data = double.parse(responseBody);
+          setState(() {
+            weatherData = data.toStringAsFixed(0); // No decimal places
+          });
+        } else {
+          setState(() {
+            weatherData = "Invalid data";
+          });
+        }
       } else {
         setState(() {
           weatherData = "Failed to fetch weather data";
@@ -161,6 +170,27 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         weatherData = "Error: $e";
       });
+    }
+  }
+
+  //fetchslider
+  Future<void> fetchSliderValue() async {
+    String pin = "V6"; // The pin for the slider
+    String url = 'https://blynk.cloud/external/api/get?token=$token&$pin';
+    try {
+      var response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        double sliderValue = double.parse(response.body);
+        int sliderDeviceIndex =
+            mySliderDevices.indexWhere((device) => device[3] == pin);
+        if (sliderDeviceIndex != -1) {
+          setState(() {
+            mySliderDevices[sliderDeviceIndex][2] = sliderValue;
+          });
+        }
+      }
+    } catch (e) {
+      print("Error fetching slider value for pin $pin: $e");
     }
   }
 
@@ -207,7 +237,6 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-
   @override
   void dispose() {
     _pollingTimer?.cancel();
@@ -234,26 +263,37 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     // menu icon
                     Text(
-                      "$weatherData °C",
-                      style:
-                          TextStyle(fontSize: 25, color: Colors.grey.shade800),
+                      double.tryParse(weatherData) != null
+                          ? "${double.parse(weatherData).toStringAsFixed(0)} °C"
+                          : weatherData, // Keep "Loading..." or any other non-double message
+                      style: TextStyle(fontSize: 35, color: Colors.black),
                     ),
 
-                    // account icon
-                    IconButton(
-                      color: Colors.grey[800],
-                      onPressed: () async {
-                        await LaunchApp.openApp(
-                          androidPackageName: 'com.DefaultCompany.switchAR',
-                          //if it installed, it will open, unless it will open playstore
-                          openStore: true,
-                        );
-                      },
-                      icon: const Icon(
-                        Icons.camera_alt_rounded,
-                        size: 45.0, // Increase the size as per your requirement
+                    // AR icon
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.black, // Set border color
+                          width: 2.0, // Set border width
+                        ),
+                        borderRadius: BorderRadius.circular(
+                            15.0), // Optional: if you want rounded corners
                       ),
-                    ),
+                      child: InkWell(
+                        onTap: () async {
+                          await LaunchApp.openApp(
+                            androidPackageName: 'com.DefaultCompany.switchAR',
+                            openStore: true,
+                          );
+                        },
+                        child: Image.asset(
+                          'lib/icons/ar1.png', // Replace with your image asset path
+                          width: 45.0, // Set the width as needed
+                          height: 45.0, // Set the height as needed
+                          color: Colors.red[800], // Set the color as needed
+                        ),
+                      ),
+                    )
                   ],
                 ),
               ),
