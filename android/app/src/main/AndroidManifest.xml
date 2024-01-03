@@ -3,7 +3,7 @@
         <package android:name="com.DefaultCompany.switchAR" /> 
     </queries>
     <application
-        android:label="switchar"
+        android:label="switchAR"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity

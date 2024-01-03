@@ -75,26 +75,27 @@ class _TemperatureControlState extends State<TemperatureControl> {
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
-          color: Colors.grey[900],
+          color: Color.fromARGB(44, 164, 167, 189),
         ),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 25.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'Temperature: ${currentTemperature.toStringAsFixed(1)}°C',
+                'Set Temperature',
                 style: TextStyle(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.normal,
                   fontSize: 20,
-                  color: Colors.white,
+                  color: Colors.black,
                 ),
               ),
+              SizedBox(height: 10), // Spacing
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    icon: Icon(Icons.remove, color: Colors.white),
+                    icon: Icon(Icons.remove, color: Colors.black),
                     onPressed: () {
                       setState(() {
                         currentTemperature--;
@@ -102,8 +103,19 @@ class _TemperatureControlState extends State<TemperatureControl> {
                       updateTemperature(currentTemperature);
                     },
                   ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                    child: Text(
+                      '${currentTemperature.toStringAsFixed(0)}°C',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 28,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
                   IconButton(
-                    icon: Icon(Icons.add, color: Colors.white),
+                    icon: Icon(Icons.add, color: Colors.black),
                     onPressed: () {
                       setState(() {
                         currentTemperature++;

@@ -54,42 +54,34 @@ class _HomePageState extends State<HomePage> {
 
   void startPolling() {
     _pollingTimer =
-        Timer.periodic(Duration(seconds: 2), (_) => syncDeviceStates());
+        Timer.periodic(Duration(seconds: 5), (_) => syncDeviceStates());
   }
 
   Future<void> syncDeviceStates() async {
-  for (String pin in virtualPins) {
-    String url = 'https://blynk.cloud/external/api/get?token=$token&$pin';
-    try {
-      var response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        if (pin == 'V6') { // Check if the pin is for the slider device
-          double sliderValue = double.parse(response.body.trim());
-          int sliderIndex = mySliderDevices.indexWhere((device) => device[3] == pin);
-          if (sliderIndex != -1) {
-            setState(() {
-              mySliderDevices[sliderIndex][2] = sliderValue;
-            });
-          }
-        } else { // For other devices (assumed boolean)
+    for (String pin in virtualPins) {
+      String url = 'https://blynk.cloud/external/api/get?token=$token&$pin';
+      try {
+        var response = await http.get(Uri.parse(url));
+        if (response.statusCode == 200) {
           bool isOn = response.body.trim() == '1';
-          int deviceIndex = mySmartDevices.indexWhere((device) => device[3] == pin);
+          int deviceIndex =
+              mySmartDevices.indexWhere((device) => device[3] == pin);
           if (deviceIndex != -1) {
             setState(() {
               mySmartDevices[deviceIndex][2] = isOn;
             });
           }
         }
+      } catch (e) {
+        print("Error fetching state for pin $pin: $e");
       }
-    } catch (e) {
-      print("Error fetching state for pin $pin: $e");
     }
   }
-}
 
   //sync slider
   void sliderPolling() {
-    _sliderTimer = Timer.periodic(Duration(seconds: 5), (_) => syncSlider());
+    _sliderTimer =
+        Timer.periodic(Duration(seconds: 5), (_) => syncSlider());
   }
 
   Future<void> syncSlider() async {
@@ -302,11 +294,11 @@ class _HomePageState extends State<HomePage> {
                     Container(
                       // decoration: BoxDecoration(
                       //   border: Border.all(
-                      //     color: Colors.black,
-                      //     width: 2.0,
+                      //     color: Colors.black, 
+                      //     width: 2.0, 
                       //   ),
                       //   borderRadius: BorderRadius.circular(
-                      //       15.0),
+                      //       15.0), 
                       // ),
                       child: InkWell(
                         onTap: () async {
@@ -319,7 +311,7 @@ class _HomePageState extends State<HomePage> {
                           'lib/icons/11.png', // Replace with your image asset path
                           width: 55.0, // Set the width as needed
                           height: 55.0, // Set the height as needed
-                          // color: Colors.red[800],
+                          // color: Colors.red[800], 
                         ),
                       ),
                     )
@@ -413,13 +405,13 @@ class _HomePageState extends State<HomePage> {
               ),
 
               // Temperature Control
-              // Padding(
-              //   padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-              //   child: TemperatureControl(
-              //     token: "NBFTcjxflna3kYS55nd5KLRAmcfDMUfi",
-              //     pin: "V8",
-              //   ),
-              // ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                child: TemperatureControl(
+                  token: "NBFTcjxflna3kYS55nd5KLRAmcfDMUfi",
+                  pin: "V8",
+                ),
+              ),
 
               // Add spacing between grids
               // const SizedBox(height: 20),
@@ -448,27 +440,6 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
               const SizedBox(height: 20),
-
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                child: Text(
-                  "Automation",
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 24,
-                    color: Colors.grey.shade800,
-                  ),
-                ),
-              ),
-
-              // Temperature Control
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                child: TemperatureControl(
-                  token: "NBFTcjxflna3kYS55nd5KLRAmcfDMUfi",
-                  pin: "V8",
-                ),
-              ),
             ],
           ),
         ),

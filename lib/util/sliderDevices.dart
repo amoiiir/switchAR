@@ -1,6 +1,4 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class sliderDevices extends StatelessWidget {
   final String smartDeviceName;
@@ -16,10 +14,10 @@ class sliderDevices extends StatelessWidget {
     required this.onChanged,
   });
 
-  @override
+   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(10.0),
+      padding: const EdgeInsets.all(5.0),
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
@@ -28,41 +26,27 @@ class sliderDevices extends StatelessWidget {
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 25.0),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              // icon
-              Image.asset(
-                iconPath,
-                height: 65,
-                color: powerOn > 0 ? Colors.white : Colors.grey.shade700,
+              Padding(
+                padding: const EdgeInsets.only(bottom: 10.0),
+                child: Text(
+                  "Light Dimmer",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20,
+                    color: powerOn > 0 ? Colors.white : Colors.black,
+                  ),
+                ),
               ),
-
-              // smart device name + slider
-              Row(
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 25.0),
-                      child: Text(
-                        smartDeviceName,
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                          color: powerOn > 0 ? Colors.white : Colors.black,
-                        ),
-                      ),
-                    ),
-                  ),
-                  Slider(
-                    value: powerOn, // Use the slider value
-                    onChanged: onChanged, // Use onChanged directly
-                    min: 0.0,
-                    max: 225.0,
-                    inactiveColor: Colors.grey.shade700,
-                    activeColor: Colors.green,
-                  ),
-                ],
-              )
+              Slider(
+                value: powerOn, // Use the slider value
+                onChanged: onChanged, // Use onChanged directly
+                min: 0.0,
+                max: 225.0,
+                inactiveColor: Colors.grey.shade700,
+                activeColor: Colors.green,
+              ),
             ],
           ),
         ),
