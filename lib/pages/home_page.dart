@@ -58,34 +58,38 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> syncDeviceStates() async {
-  for (String pin in virtualPins) {
-    String url = 'https://blynk.cloud/external/api/get?token=$token&$pin';
-    try {
-      var response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        if (pin == 'V6') { // Check if the pin is for the slider device
-          double sliderValue = double.parse(response.body.trim());
-          int sliderIndex = mySliderDevices.indexWhere((device) => device[3] == pin);
-          if (sliderIndex != -1) {
-            setState(() {
-              mySliderDevices[sliderIndex][2] = sliderValue;
-            });
-          }
-        } else { // For other devices (assumed boolean)
-          bool isOn = response.body.trim() == '1';
-          int deviceIndex = mySmartDevices.indexWhere((device) => device[3] == pin);
-          if (deviceIndex != -1) {
-            setState(() {
-              mySmartDevices[deviceIndex][2] = isOn;
-            });
+    for (String pin in virtualPins) {
+      String url = 'https://blynk.cloud/external/api/get?token=$token&$pin';
+      try {
+        var response = await http.get(Uri.parse(url));
+        if (response.statusCode == 200) {
+          if (pin == 'V6') {
+            // Check if the pin is for the slider device
+            double sliderValue = double.parse(response.body.trim());
+            int sliderIndex =
+                mySliderDevices.indexWhere((device) => device[3] == pin);
+            if (sliderIndex != -1) {
+              setState(() {
+                mySliderDevices[sliderIndex][2] = sliderValue;
+              });
+            }
+          } else {
+            // For other devices (assumed boolean)
+            bool isOn = response.body.trim() == '1';
+            int deviceIndex =
+                mySmartDevices.indexWhere((device) => device[3] == pin);
+            if (deviceIndex != -1) {
+              setState(() {
+                mySmartDevices[deviceIndex][2] = isOn;
+              });
+            }
           }
         }
+      } catch (e) {
+        print("Error fetching state for pin $pin: $e");
       }
-    } catch (e) {
-      print("Error fetching state for pin $pin: $e");
     }
   }
-}
 
   //sync slider
   void sliderPolling() {
@@ -210,27 +214,6 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  // //fetchslider
-  // Future<void> fetchSliderValue() async {
-  //   String pin = "V6"; // The pin for the slider
-  //   String url = 'https://blynk.cloud/external/api/get?token=$token&$pin';
-  //   try {
-  //     var response = await http.get(Uri.parse(url));
-  //     if (response.statusCode == 200) {
-  //       double sliderValue = double.parse(response.body);
-  //       int sliderDeviceIndex =
-  //           mySliderDevices.indexWhere((device) => device[3] == pin);
-  //       if (sliderDeviceIndex != -1) {
-  //         setState(() {
-  //           mySliderDevices[sliderDeviceIndex][2] = sliderValue;
-  //         });
-  //       }
-  //     }
-  //   } catch (e) {
-  //     print("Error fetching slider value for pin $pin: $e");
-  //   }
-  // }
-
   void processMessage(dynamic message) {
     // Assuming 'message' is a JSON string with information about device states
     // Example message format: {"devicePin": "V1", "state": "1"}
@@ -300,14 +283,6 @@ class _HomePageState extends State<HomePage> {
 
                     // AR icon
                     Container(
-                      // decoration: BoxDecoration(
-                      //   border: Border.all(
-                      //     color: Colors.black,
-                      //     width: 2.0,
-                      //   ),
-                      //   borderRadius: BorderRadius.circular(
-                      //       15.0),
-                      // ),
                       child: InkWell(
                         onTap: () async {
                           await LaunchApp.openApp(
@@ -411,18 +386,6 @@ class _HomePageState extends State<HomePage> {
                   );
                 },
               ),
-
-              // Temperature Control
-              // Padding(
-              //   padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-              //   child: TemperatureControl(
-              //     token: "NBFTcjxflna3kYS55nd5KLRAmcfDMUfi",
-              //     pin: "V8",
-              //   ),
-              // ),
-
-              // Add spacing between grids
-              // const SizedBox(height: 20),
 
               // Second grid (Repeat the structure for the second grid)
               const SizedBox(height: 0),
