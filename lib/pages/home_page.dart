@@ -31,7 +31,7 @@ class _HomePageState extends State<HomePage> {
   List mySmartDevices = [
     // [ smartDeviceName, iconPath , powerStatus ]
     ["Red Light", "lib/icons/light-bulb.png", false, "V1"],
-    ["Main Light", "lib/icons/light-bulb.png", false, "V2"],
+    ["White Light", "lib/icons/light-bulb.png", false, "V2"],
     ["Yellow Light", "lib/icons/light-bulb.png", false, "V3"],
     ["Smart Fan", "lib/icons/fan.png", false, "V4"],
   ];
