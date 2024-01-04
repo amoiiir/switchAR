@@ -283,6 +283,10 @@ class _HomePageState extends State<HomePage> {
 
                     // AR icon
                     Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color.fromARGB(217, 37, 33, 33) // Replace with your desired background color
+                      ),
                       child: InkWell(
                         onTap: () async {
                           await LaunchApp.openApp(
@@ -290,14 +294,18 @@ class _HomePageState extends State<HomePage> {
                             openStore: true,
                           );
                         },
-                        child: Image.asset(
-                          'lib/icons/11.png', // Replace with your image asset path
-                          width: 55.0, // Set the width as needed
-                          height: 55.0, // Set the height as needed
-                          // color: Colors.red[800],
+                        child: Padding(
+                          padding: const EdgeInsets.all(
+                              8.0), // Adjust padding as needed
+                          child: Image.asset(
+                            'lib/icons/3.png', // Replace with your image asset path
+                            width: 40.0, // Set the width as needed
+                            height: 40.0, // Set the height as needed
+                            // You can add color here if needed: color: Colors.white,
+                          ),
                         ),
                       ),
-                    )
+                    ),
                   ],
                 ),
               ),
