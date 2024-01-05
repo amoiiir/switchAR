@@ -18,11 +18,12 @@ Implement an automation feature where users can set conditions to automatically 
 Simplify setup and customization for users by automatically adding and configuring switches in SwitchAR, ensuring a hassle-free experience.
 Integrate SwitchAR with Google Home Assistant for voice command capabilities, allowing users to control their smart home devices through spoken instructions.
 
-## Products
+## End Product
 ### Smart Home Device
-
+![smart home device]([https://github.com/amoiiir/switchAR/blob/82a1a04b74001d36fa36530e5ce99af5e83ed9ee/lib/icons/switchAR%20(1).png](https://github.com/amoiiir/switchAR/blob/128cf4a105b10ffd93907dc426dd9484de1ea825/lib/icons/homeDevice.png)).
 ### Image Target
-
+![image target1](https://github.com/amoiiir/switchAR/blob/128cf4a105b10ffd93907dc426dd9484de1ea825/lib/icons/3.jpg).
+![image target2](https://github.com/amoiiir/switchAR/blob/128cf4a105b10ffd93907dc426dd9484de1ea825/lib/icons/4.jpg).
 ### Mobile Interface
 ![Mobile Interface](https://github.com/amoiiir/switchAR/blob/82a1a04b74001d36fa36530e5ce99af5e83ed9ee/lib/icons/switchAR%20(1).png).
 
