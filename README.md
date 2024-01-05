@@ -23,13 +23,13 @@ Integrate SwitchAR with Google Home Assistant for voice command capabilities, al
 
 ## End Product
 ### Smart Home Device
-![home device](https://github.com/amoiiir/switchAR/blob/95c241d7927bee970cce0e10184d862e3fec6317/lib/icons/homeDevice.png).
+![home device](https://github.com/amoiiir/switchAR/blob/95c241d7927bee970cce0e10184d862e3fec6317/lib/icons/homeDevice.png)
 ### Image Target
-![image target1](https://github.com/amoiiir/switchAR/blob/128cf4a105b10ffd93907dc426dd9484de1ea825/lib/icons/3.jpg).
-![image target2](https://github.com/amoiiir/switchAR/blob/128cf4a105b10ffd93907dc426dd9484de1ea825/lib/icons/4.jpg).
+![image target1](https://github.com/amoiiir/switchAR/blob/128cf4a105b10ffd93907dc426dd9484de1ea825/lib/icons/3.jpg)
+![image target2](https://github.com/amoiiir/switchAR/blob/128cf4a105b10ffd93907dc426dd9484de1ea825/lib/icons/4.jpg)
 ### Mobile Interface
-![Mobile Interface](https://github.com/amoiiir/switchAR/blob/82a1a04b74001d36fa36530e5ce99af5e83ed9ee/lib/icons/switchAR%20(1).png).
+![Mobile Interface](https://github.com/amoiiir/switchAR/blob/82a1a04b74001d36fa36530e5ce99af5e83ed9ee/lib/icons/switchAR%20(1).png)
 
 ## Report and documentations
-1. Read our Final Year Report [Here](https://github.com/amoiiir/switchAR/blob/b0cd389623492035f7d92e3b487bcd1826b20309/Documentation/switchAR%20FYP2%20Report.pdf).
+1. Read our Final Year Report [Here](https://github.com/amoiiir/switchAR/blob/b0cd389623492035f7d92e3b487bcd1826b20309/Documentation/switchAR%20FYP2%20Report.pdf)
 2. Read our Technical Report [Here]().
