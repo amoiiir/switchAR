@@ -1,4 +1,4 @@
-# SWITCHAR (AR VIRTUAL SWITCH CONTROL FOR IOT-BASED SMART HOME AUTOMATION)
+# switchAR (AR Virtual Switch Control For IoT-Based Smart Home Automation)
 
 ## Owned by
 - Muhammad Haikal Wijdan bin Rizal
