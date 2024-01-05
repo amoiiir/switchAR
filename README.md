@@ -5,7 +5,7 @@
 - Muhammad Amir Hamzah Bin Abd Aziz
 
 > [!IMPORTANT]  
-> This project consists of integrating Flutter Framework, Arduino code as well as Unity Files to work.
+> This project consists of integrating Flutter Framework, Arduino code as well as Unity Files to work. In this documentation, Unity files are not included inside of this repository. If you wish to get all the files for this project, head over to our [Google Drive](https://drive.google.com/drive/folders/1lSW9Z3RYHye8BusnRxx2tFu9ZIS1K9iB?usp=sharing).
 
 ## Abstract
 SwitchAR is a mobile app that combines augmented reality (AR) and Internet of Things (IoT) technology to make controlling smart home devices easy and fun. This app is specially designed for homeowners, including elderly and disabled individuals who might find it hard to move around or use regular switches. With SwitchAR, they can control lights, temperature, and other home appliances directly from their smartphones, making daily tasks simpler and more accessible.
@@ -31,5 +31,5 @@ Integrate SwitchAR with Google Home Assistant for voice command capabilities, al
 ![Mobile Interface](https://github.com/amoiiir/switchAR/blob/82a1a04b74001d36fa36530e5ce99af5e83ed9ee/lib/icons/switchAR%20(1).png)
 
 ## Report and documentations
-1. Read our Final Year Report [Here](https://github.com/amoiiir/switchAR/blob/b0cd389623492035f7d92e3b487bcd1826b20309/Documentation/switchAR%20FYP2%20Report.pdf)
+1. Read our Final Year Report [Here](https://github.com/amoiiir/switchAR/blob/b0cd389623492035f7d92e3b487bcd1826b20309/Documentation/switchAR%20FYP2%20Report.pdf).
 2. Read our Technical Report [Here]().
