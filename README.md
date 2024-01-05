@@ -7,6 +7,14 @@
 > [!IMPORTANT]  
 > This project consists of integrating Flutter Framework, Arduino code as well as Unity Files to work. In this documentation, Unity files are not included inside of this repository. If you wish to get all the files for this project, head over to our [Google Drive](https://drive.google.com/drive/folders/1lSW9Z3RYHye8BusnRxx2tFu9ZIS1K9iB?usp=sharing).
 
+## Tools used
+1. Arduino
+2. Unity
+3. Vuforia Engine
+4. Blynk
+5. Flutter
+6. IFTT
+
 ## Abstract
 SwitchAR is a mobile app that combines augmented reality (AR) and Internet of Things (IoT) technology to make controlling smart home devices easy and fun. This app is specially designed for homeowners, including elderly and disabled individuals who might find it hard to move around or use regular switches. With SwitchAR, they can control lights, temperature, and other home appliances directly from their smartphones, making daily tasks simpler and more accessible.
 
