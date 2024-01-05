@@ -10,5 +10,5 @@ SwitchAR is a mobile app that combines augmented reality (AR) and Internet of Th
 The project aims to address the challenges faced by many in using current smart home systems, which can be complex and difficult to manage. SwitchAR simplifies this by offering a single, easy-to-use platform that brings together all home devices. It's particularly beneficial for those with mobility issues, providing a way to control their home environment easily and independently, enhancing their quality of life.
 
 ## Report and documentations
-1. Read our Final Year Report [Here](https://github.com/amoiiir/switchAR/blob/e6d5faa425cae4b9ada3c7bc06da491fe26b5161/Documentation/SD29%20SwitchAR%20FYP2%20Poster.pdf).
+1. Read our Final Year Report [Here](https://github.com/amoiiir/switchAR/blob/b0cd389623492035f7d92e3b487bcd1826b20309/Documentation/switchAR%20FYP2%20Report.pdf).
 2. Read our Technical Report [Here]().
