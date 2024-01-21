@@ -42,4 +42,4 @@ Integrate SwitchAR with Google Home Assistant for voice command capabilities, al
 
 ## Report and documentations
 1. Read our Final Year Report [Here](https://github.com/amoiiir/switchAR/blob/b0cd389623492035f7d92e3b487bcd1826b20309/Documentation/switchAR%20FYP2%20Report.pdf).
-2. Read our Technical Report [Here]([https://github.com/amoiiir/switchAR/blob/main/Documentation/switchAR%20FYP2%20Report.pdf]).
+2. Read our Technical Report [Here](https://github.com/amoiiir/switchAR/blob/main/Documentation/SD29%20SwitchAR%20Technical%20Report.pdf).
