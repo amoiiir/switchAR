@@ -126,28 +126,61 @@ class _HomePageState extends State<HomePage> {
 
   //device power
   // Function to toggle device power and make API call
+  // void toggleDevicePower(int index, bool newState) async {
+  //   setState(() {
+  //     // mySmartDevices[index][2] = !mySmartDevices[index][2];
+  //     mySmartDevices[index][2] = newState;
+  //   });
+
+  //   String token = "NBFTcjxflna3kYS55nd5KLRAmcfDMUfi";
+  //   String devicePin = mySmartDevices[index][3];
+  //   int value = mySmartDevices[index][2] ? 1 : 0;
+
+  //   String url =
+  //       "https://blynk.cloud/external/api/update?token=$token&$devicePin=$value";
+
+  //   try {
+  //     final response = await http.get(Uri.parse(url));
+  //     if (response.statusCode == 200) {
+  //       // Handle successful response
+  //     } else {
+  //       // Handle error
+  //     }
+  //   } catch (e) {
+  //     // Handle network error
+  //   }
+  // }
+
   void toggleDevicePower(int index, bool newState) async {
+    bool originalState = mySmartDevices[index][2]; // Save the original state
     setState(() {
-      // mySmartDevices[index][2] = !mySmartDevices[index][2];
+      // Optimistically update the UI
       mySmartDevices[index][2] = newState;
     });
 
     String token = "NBFTcjxflna3kYS55nd5KLRAmcfDMUfi";
     String devicePin = mySmartDevices[index][3];
-    int value = mySmartDevices[index][2] ? 1 : 0;
+    int value = newState ? 1 : 0;
 
     String url =
         "https://blynk.cloud/external/api/update?token=$token&$devicePin=$value";
 
     try {
       final response = await http.get(Uri.parse(url));
-      if (response.statusCode == 200) {
-        // Handle successful response
-      } else {
-        // Handle error
+      if (response.statusCode != 200) {
+        // If the response is not successful, revert the change
+        setState(() {
+          mySmartDevices[index][2] = originalState;
+        });
+        // Optionally show an error message to the user
+        // e.g., using a Snackbar
       }
     } catch (e) {
-      // Handle network error
+      // In case of an error, revert the UI and show an error message
+      setState(() {
+        mySmartDevices[index][2] = originalState;
+      });
+      // Show error message
     }
   }
 
@@ -284,9 +317,10 @@ class _HomePageState extends State<HomePage> {
                     // AR icon
                     Container(
                       decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Color.fromARGB(217, 37, 33, 33) // Replace with your desired background color
-                      ),
+                          shape: BoxShape.circle,
+                          color: Color.fromARGB(217, 37, 33,
+                              33) // Replace with your desired background color
+                          ),
                       child: InkWell(
                         onTap: () async {
                           await LaunchApp.openApp(
