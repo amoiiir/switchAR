@@ -15,6 +15,8 @@
 5. Flutter
 6. IFTTT
 
+## Final Year Poster
+
 ## Abstract
 SwitchAR is a mobile app that combines augmented reality (AR) and Internet of Things (IoT) technology to make controlling smart home devices easy and fun. This app is specially designed for homeowners, including elderly and disabled individuals who might find it hard to move around or use regular switches. With SwitchAR, they can control lights, temperature, and other home appliances directly from their smartphones, making daily tasks simpler and more accessible.
 
@@ -40,4 +42,4 @@ Integrate SwitchAR with Google Home Assistant for voice command capabilities, al
 
 ## Report and documentations
 1. Read our Final Year Report [Here](https://github.com/amoiiir/switchAR/blob/b0cd389623492035f7d92e3b487bcd1826b20309/Documentation/switchAR%20FYP2%20Report.pdf).
-2. Read our Technical Report [Here]().
+2. Read our Technical Report [Here](https://github.com/amoiiir/switchAR/blob/main/Documentation/SD29%20SwitchAR%20Technical%20Report.pdf).
