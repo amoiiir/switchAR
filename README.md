@@ -1,6 +1,6 @@
 # switchAR (AR Virtual Switch Control For IoT-Based Smart Home Automation)
 
-  [![HitCount](https://hits.dwyl.com/amoiiir/amoiiir/switchAR.svg?style=flat)](http://hits.dwyl.com/amoiiir/amoiiir/switchAR)
+  [![HitCount](https://hits.dwyl.com/amoiiir/amoiiir/switchAR.svg?style=flat-square)](http://hits.dwyl.com/amoiiir/amoiiir/switchAR)
 
 ## Owned by
 - Muhammad Haikal Wijdan bin Rizal
